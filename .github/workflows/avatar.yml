@@ -1,0 +1,35 @@
+name: Set moon avatar
+
+on:
+  schedule:
+    - cron: "5 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  set-moon:
+    runs-on: ubuntu-latest
+    env:
+      GH_PAT: ${{ secrets.MOONSH_GH_TOKEN }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up mise
+        uses: jdx/mise-action@v4
+
+      - name: Fetch moon and publish avatar/status
+        run: ./scripts/moon.sh -i -e
+
+      - name: Commit moon image
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add moon.png
+          if git diff --cached --quiet; then
+            echo "moon.png unchanged"
+          else
+            git commit -m "Update moon image for $(date -u +%Y-%m-%d)"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi

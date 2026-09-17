@@ -1,0 +1,6 @@
+[tools]
+imagemagick = "7.1"
+jq = "1.8"
+
+[tasks.build]
+run = "./scripts/moon.sh"
